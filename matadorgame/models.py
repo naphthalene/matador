@@ -18,9 +18,6 @@ class Player(models.Model):
     def get_last_move(self, game):
         raise Exception('Not implemented')
 
-    class Meta:
-        abstract = True
-
 class HumanPlayer(Player):
     """
     A human user of this application
@@ -53,16 +50,18 @@ class Game(models.Model):
         Player,
         null=True,
         blank=True,
-        help_text="Player 1")
+        help_text="Player 1",
+        related_name='game_one')
 
     player2 = models.ForeignKey(
         Player,
         null=True,
         blank=True,
-        help_text="Player 2")
+        help_text="Player 2",
+        related_name='game_two')
 
-    player1number = models.IntegerField(validator=[valid_guess])
-    player2number = models.IntegerFIeld(validator=[valid_guess])
+    player1number = models.IntegerField(validators=[valid_guess])
+    player2number = models.IntegerField(validators=[valid_guess])
 
     def get_moves(self):
         raise Exception('Not implemented')
