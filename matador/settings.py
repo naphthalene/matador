@@ -36,7 +36,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'matadorgame'
+    'matadorgame',
+    'guardian'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -48,6 +49,13 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+AUTHENTICATION_BACKENDS = {
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
+}
+
+ANONYMOUS_USER_ID = -1
+
 ROOT_URLCONF = 'matador.urls'
 
 WSGI_APPLICATION = 'matador.wsgi.application'
@@ -58,8 +66,11 @@ WSGI_APPLICATION = 'matador.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'matador',
+        'USER': 'matador',
+        'PASSWORD': 'matador',
+        'HOST': 'localhost'
     }
 }
 

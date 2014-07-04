@@ -1,0 +1,4 @@
+django
+django-guardian
+zope.dottedname
+psycopg2

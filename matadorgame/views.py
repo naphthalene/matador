@@ -1,22 +1,32 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth import logout, login, authenticate
+from matadorgame.models import HumanPlayer, Game, Move
 
+## TODO route
 def login_view(request):
+    login_context     = {}
+    # ----------------------------------------------------------
     username = request.POST['username']
     password = request.POST['password']
     user = authenticate(username=username, password=password)
     if user is not None:
         if user.is_active:
             login(request, user)
-            # Redirect to a success page.
+            redirect('dashboard_view', permanent=True)
         else:
-            # Return a 'disabled account' error message
+            pass
     else:
-        # Return an 'invalid login' error message.
+        redirect('login_view')
 
+## TODO route
 def logout_view(request):
     logout(request)
 
 @login_required
-def dashboard(request):
-    pass
+def dashboard_view(request):
+    dash_template = 'dashboard.html'
+    dash_context  = {}
+    # ----------------------------------------------------------
+    player = HumanPlayer(user=request.user)
+    dash_context['my_games'] = player.get_games()
+    render(request, dash_template, context=dash_context)
