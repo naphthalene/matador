@@ -1,0 +1,30 @@
+{% extends "matadorgame/base.html" %}
+{% load opponent from game %}
+{% load static %}
+
+{% block content %}
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading">My Games</div>
+
+  <!-- Table -->
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Opponent</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for game in my_games %}
+      <tr class="clickableRow" href="games/{{game.id}}">
+        <td>{{ game.id }}</td>
+        <td>{% opponent game me %}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+{% block scripts%}
+<script src="{% static "matadorgame/js/dashboard.js" %}"></script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "matadorgame/base.html" %}
+
+{% block content %}
+
+{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+<form role="form"
+      method="post"
+      action="{% url 'django.contrib.auth.views.login' %}">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="id_username">{{ form.username.label_tag }}</label>
+    <input type="text" class="form-control"
+           name="username" id="id_username" placeholder="Enter username">
+  </div>
+  <div class="form-group">
+    <label for="id_password">Password</label>
+    <input type="password" name="password"
+           class="form-control" id="id_password" placeholder="Enter password">
+  </div>
+  <button type="submit" value="login" class="btn btn-default">Submit</button>
+  <input type="hidden" name="next" value="{{ next }}" />
+</form>
+<!-- <form class="navbar-form navbar-left" -->
+<!--       method="post" -->
+<!--       action="{% url 'django.contrib.auth.views.login' %}"> -->
+<!--   {% csrf_token %} -->
+<!-- <div class="form-group"> -->
+<!--   {{ form.username.label_tag }} -->
+<!--   {{ form.username }} -->
+<!--   {{ form.password.label_tag }} -->
+<!--   {{ form.password }} -->
+<!-- </div> -->
+
+<!--   <input type="submit" value="login" /> -->
+<!--   <input type="hidden" name="next" value="{{ next }}" /> -->
+<!-- </form> -->
+
+{% endblock %}

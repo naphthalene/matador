@@ -1,13 +1,23 @@
-from django.db import models as M
-from django.contrib.auth.models import User, Group
-from zope.dottedname.resolve import resolve
+from random import Random
 from itertools import chain
+from django.db import models as M
+from model_utils.managers import InheritanceManager
+from zope.dottedname.resolve import resolve
+from django.contrib.auth.models import User, Group
 
 """
 Models for the game ``Matador`` or Bulls & Cows with bots
 """
 
 class Player(M.Model):
+    name = M.CharField(
+        max_length=128,
+        unique=True,
+        null=False,
+        blank=False,
+        help_text="Name for this bot player")
+
+    objects = InheritanceManager()
     """
     Can either be a User or a Bot
     """
@@ -16,7 +26,7 @@ class Player(M.Model):
                           self.games_as_second.all()))
 
     def get_next_move(self, game):
-        return Move.objects.create(game=game)
+        pass
 
 class HumanPlayer(Player):
     """
@@ -25,14 +35,11 @@ class HumanPlayer(Player):
     user = M.OneToOneField(User)
     region = M.CharField(max_length=128)
 
-class Bot(Player):
-    name = M.CharField(
-        max_length=128,
-        unique=True,
-        null=False,
-        blank=False,
-        help_text="Name for this bot player")
+    def get_next_move(self, game):
+        ## TODO email user and update any active page
+        pass
 
+class Bot(Player):
     description = M.TextField(
         null=False,
         blank=True,
@@ -46,8 +53,7 @@ class Bot(Player):
         help_text="Full dotted name of Bot subclass")
 
     def get_next_move(self, game):
-        Bot_Class = resolve(self.implementation)
-        bot_guess = Bot_Class().guess(game)
+        bot_guess = resolve(self.implementation)().guess(game)
         return Move.objects.create(game=game,
                                    player=self,
                                    guess=bot_guess)
@@ -70,7 +76,7 @@ class Game(M.Model):
         related_name="games_as_second")
 
     def get_opponent(self, player):
-        if player == self.player1:
+        if player.id == self.player1.id:
             return self.player2
         else:
             return self.player1
@@ -97,7 +103,6 @@ class Move(M.Model):
 
     def save(self, *args, **kwargs):
         if self.guess:
-            print "Got a guess"
             self.bulls, self.cows = self._evaluate(self.guess)
         super(Move, self).save(*args, **kwargs)
 
@@ -106,24 +111,29 @@ class Move(M.Model):
             number = PlayerNumber.objects.get(
                 player=self.game.get_opponent(self.player),
                 game=self.game).number
+            print "Player %s made guess of %s where real number is %s" \
+                % (self.player.name, guess, number)
             bulls = []
             cows  = []
             for spot in range(4):
-                # 0, 1, 2, 3
                 if guess[spot] == number[spot]:
                     cows.append(spot)
+
+            guessed_spots = cows[:]
             for spot in range(4):
                 if spot in cows:
                     # This digit is already a cow, skip
                     continue
                 for subspot in range(4):
-                    if subspot in cows or subspot in bulls:
+                    # If the digit in the ``number`` has already been
+                    # claimed by another digit in the guess
+                    if subspot in guessed_spots:
                         continue
                     if guess[spot] == number[subspot]:
                         bulls.append(spot)
+                        guessed_spots.append(subspot)
                         break
 
-            print bulls, cows
             return (len(bulls), len(cows))
         except Exception as e:
             print e

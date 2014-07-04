@@ -2,3 +2,4 @@ django
 django-guardian
 zope.dottedname
 psycopg2
+django-model-utils

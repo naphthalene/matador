@@ -3,13 +3,13 @@
     "pk": 1,
     "model": "matadorgame.player",
     "fields": {
+      "name": "DumbBot"
     }
   },
   {
     "pk": 1,
     "model": "matadorgame.bot",
     "fields": {
-      "name": "DumbBot",
       "description": "Really really stupid",
       "implementation": "matadorgame.bots.dumb.DumbBot"
     }

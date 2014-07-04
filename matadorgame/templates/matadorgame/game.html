@@ -1,0 +1,78 @@
+{% extends "matadorgame/base.html" %}
+{% load opponent from game %}
+{% load static %}
+
+{% block extra_head %}
+<!-- Custom styles for this template -->
+<link href="{% static "matadorgame/css/game.css"%}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading">Game {{ game.id }} against {% opponent game me %} </div>
+
+  <div class="container">
+    <h4 class="mynumber">My number: {{ my_num }}</h4>
+    <div class="row">
+      <div class="col-md-5">
+        <h3>Make Guess</h3>
+
+        <form role="form"
+              method="post"
+              action="{% url 'matadorgame.views.guess' %}">
+          <div class="form-group">
+            <label for="id_value">Guess</label>
+            <input type="text" class="form-control"
+                   name="value" id="id_value" placeholder="0000">
+          </div>
+          <input type="hidden" name="game_id" value="{{ game.id }}">
+          <button type="submit" value="login" class="btn btn-default">Submit</button>
+        </form>
+      </div>
+      <div class="col-md-3">
+        <h3>My Moves</h3>
+        <!-- Table of moves -->
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Guess</th>
+              <th>Bulls</th>
+              <th>Cows</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for move in my_moves %}
+            <tr>
+              <td>{{ move.guess }}</td>
+              <td>{{ move.bulls }}</td>
+              <td>{{ move.cows }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+      <div class="col-md-3">
+        <h3>Opponent Moves</h3>
+        <!-- Table of moves -->
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Guess</th>
+              <th>Bulls</th>
+              <th>Cows</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for move in opponent_moves %}
+            <tr>
+              <td>{{ move.guess }}</td>
+              <td>{{ move.bulls }}</td>
+              <td>{{ move.cows }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
