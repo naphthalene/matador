@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect
 from matadorgame.models import HumanPlayer, Game, Move, PlayerNumber, Player
 from django.contrib.auth import logout, login, authenticate
@@ -14,7 +14,12 @@ def dashboard_view(request):
     # Implementation
     player = HumanPlayer.objects.get(user=request.user)
     dash_context['me'] = player
-    dash_context['my_games'] = player.get_games()
+    dash_context['my_games'] = sorted(player.get_games(),
+                                      key=lambda g: g.id,
+                                      reverse=True)
+    dash_context['invites'] = sorted(player.get_invitations(),
+                                     key=lambda g: g.id,
+                                     reverse=True)
     print dash_context['me']
     return render(request, dash_template, dash_context)
 
@@ -26,15 +31,23 @@ def game(request, game_id):
     # Implementation
     game = Game.objects.get(id=game_id)
     player = HumanPlayer.objects.get(user=request.user)
-    my_number = PlayerNumber.objects.get(game=game, player=player).number
-    game_context['me'] = player
-    game_context['game'] = game
-    game_context['my_num'] = my_number
-    game_context['my_moves'] \
-        = game.moves.filter(player=player)
-    game_context['opponent_moves'] \
-        = game.moves.filter(player=game.get_opponent(player))
-    return render(request, game_template, game_context)
+
+    # Check that the opponent has created a number for this game (accepted)
+    opponent = game.get_opponent(player)
+    try:
+        opponent_number =PlayerNumber.objects.get(game=game, player=opponent)
+        my_number = PlayerNumber.objects.get(game=game, player=player).number
+        game_context['me'] = player
+        game_context['game'] = game
+        game_context['my_num'] = my_number
+        game_context['my_moves'] \
+            = game.moves.filter(player=player)
+        game_context['opponent_moves'] \
+            = game.moves.filter(player=game.get_opponent(player))
+        return render(request, game_template, game_context)
+    except:
+        # Means the opponent hasn't accepted the invitation yet
+        return redirect('matadorgame.views.dashboard_view')
 
 @csrf_exempt
 @require_POST
@@ -61,3 +74,43 @@ def guess(request):
         hresp = HttpResponse(e.__str__())
         hresp.status_code=400
         return hresp
+
+@csrf_exempt
+@require_POST
+def accept_game(request):
+    # ----------------------------------------------------------
+    # Implementation
+    player = HumanPlayer.objects.get(user=request.user)
+    number = request.POST['number']
+    game_id = int(request.POST['game_id'])
+    game = Game.objects.get(id=game_id)
+    PlayerNumber.objects.create(game=game, player=player, number=number)
+    return redirect('matadorgame.views.game', game_id)
+
+@csrf_exempt
+@require_POST
+def new_game(request):
+    # ----------------------------------------------------------
+    # Implementation
+    player = HumanPlayer.objects.get(user=request.user)
+
+    opponent_id = request.POST['opponent'][1:-1]
+    opponent = Player.objects.get_subclass(id=opponent_id)
+
+    game = Game.objects.create(player1=player, player2=opponent)
+
+    my_number = request.POST['number']
+    PlayerNumber.objects.create(game=game, player=player, number=my_number)
+
+    opponent.request_secret_number(game)
+
+    return redirect('matadorgame.views.game', game.id)
+
+
+@csrf_exempt
+@require_POST
+def player_suggest(request):
+    player = HumanPlayer.objects.get(user=request.user)
+    query = request.REQUEST['query']
+    json_list = Player.get_suggestions(query, exclude_id=player.id)
+    return HttpResponse(json_list, content_type='application/json')

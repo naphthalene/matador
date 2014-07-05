@@ -1,3 +1,4 @@
+import json
 from random import Random
 from itertools import chain
 from django.db import models as M
@@ -25,8 +26,37 @@ class Player(M.Model):
         return list(chain(self.games_as_first.all(),
                           self.games_as_second.all()))
 
+    def get_invitations(self):
+        def unaccepted_games(game):
+            return not PlayerNumber.objects.filter(game=game,
+                                                   player=self).exists()
+        return filter(unaccepted_games, self.get_games())
+
     def get_next_move(self, game):
         pass
+
+    def request_secret_number(self, game):
+        number = ''
+        rand = Random()
+        for i in range(4):
+            number += str(rand.randint(0, 9))
+        return PlayerNumber.objects.create(game=game,
+                                           player=self,
+                                           number=number)
+
+    @staticmethod
+    def get_suggestions(query, exclude_id=None):
+        if exclude_id:
+            players = Player.objects.exclude(id=exclude_id)\
+                                    .filter(name__icontains=query)
+        else:
+            players = Player.objects.all()\
+                                    .filter(name__icontains=query)
+
+        player_zip = map(lambda p: (p.id, p.name), players)
+        return json.dumps(
+            [{ "id": p[0], "name": p[1] } for p in player_zip]
+        )
 
 class HumanPlayer(Player):
     """
@@ -37,6 +67,10 @@ class HumanPlayer(Player):
 
     def get_next_move(self, game):
         ## TODO email user and update any active page
+        pass
+
+    def request_secret_number(self, game):
+        ## TODO email user to finish initalizing the game
         pass
 
 class Bot(Player):
@@ -53,7 +87,7 @@ class Bot(Player):
         help_text="Full dotted name of Bot subclass")
 
     def get_next_move(self, game):
-        bot_guess = resolve(self.implementation)().guess(game)
+        bot_guess = resolve(self.implementation)().guess(self, game)
         return Move.objects.create(game=game,
                                    player=self,
                                    guess=bot_guess)
@@ -80,6 +114,39 @@ class Game(M.Model):
             return self.player2
         else:
             return self.player1
+
+    def get_status(self, player):
+        # Possible statuses:
+        # 1) Pending
+        # 2) Active
+        # 3) Won
+        # 4) Lost
+        opponent = self.get_opponent(player)
+        try:
+             PlayerNumber.objects.get(game=self, player=opponent)
+        except:
+            # The other player hasn't made come up with a number
+            # yet. Game is pending
+            return "Pending"
+
+        player_moves   = self.moves.filter(player=player)
+        opponent_moves = self.moves.filter(player=opponent)
+        player_guessed_right   = player_moves.filter(cows=4).exists()
+        opponent_guessed_right = opponent_moves.filter(cows=4).exists()
+
+        if player_guessed_right and opponent_guessed_right:
+            if len(player_moves) <= len(opponent_moves):
+                return "Won"
+            else:
+                return "Lost"
+        elif player_guessed_right and \
+             len(opponent_moves) >= len(player_moves):
+            return "Won"
+        elif opponent_guessed_right and \
+             len(opponent_moves) < len(player_moves):
+            return "Lost"
+        else:
+            return "Active"
 
 class Move(M.Model):
     game = M.ForeignKey(Game, related_name='moves')

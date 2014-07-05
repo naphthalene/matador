@@ -11,6 +11,9 @@
     <!-- Custom styles for this template -->
     <link href="{% static "matadorgame/css/base.css"%}" rel="stylesheet">
 
+    <!-- https://github.com/silviomoreto/bootstrap-select -->
+    <link href="{% static "matadorgame/css/bootstrap-select.min.css"%}" rel="stylesheet">
+
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -47,9 +50,12 @@
       {% endblock %}
     </div>
 
-    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <!-- Latest compiled and minified JavaScript -->
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+    <!-- Locally hosted javascript (minified) -->
+    <script src="{% static "matadorgame/js/bootstrap-select.min.js" %}"></script>
     {% block scripts%}
     {% endblock %}
   </body>

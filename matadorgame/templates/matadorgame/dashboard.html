@@ -1,30 +1,99 @@
 {% extends "matadorgame/base.html" %}
-{% load opponent from game %}
+{% load game %}
 {% load static %}
+
+{% block extra_head %}
+<!-- Custom styles for this template -->
+<link href="{% static "matadorgame/css/magicsuggest-1.3.1-min.css"%}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 <div class="panel panel-default">
   <!-- Default panel contents -->
-  <div class="panel-heading">My Games</div>
-
-  <!-- Table -->
-  <table class="table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Opponent</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for game in my_games %}
-      <tr class="clickableRow" href="games/{{game.id}}">
-        <td>{{ game.id }}</td>
-        <td>{% opponent game me %}</td>
-      </tr>
-    {% endfor %}
-  </table>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-7">
+        <h3>My Games</h3>
+        <!-- Table -->
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Opponent</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for game in my_games %}
+            <tr class="clickableRow" href="games/{{game.id}}">
+              <td>{{ game.id }}</td>
+              <td>{% opponent game me %}</td>
+              <td>{% status game me %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-4">
+        <div class="row">
+          <h3>New Game</h3>
+          <!-- New Game form -->
+          <form role="form"
+                method="post"
+                action="{% url 'matadorgame.views.new_game' %}">
+            <div class="form-group">
+              <label for="player_suggest">Opponent</label>
+              <input class="form-control span3" autocomplete="false"
+                     id="player_suggest" name="opponent" type="text" />
+              <label for="id_number">Your secret number</label>
+              <input class="form-control" type="text"
+                     name="number" id="id_number" placeholder="0000">
+            </div>
+            <button type="submit" value="create_new"
+                    class="btn btn-default">Create new game</button>
+          </form>
+        </div>
+        <div class="row">
+          <h3>Invitations</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Opponent</th>
+                <th>Number</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for game in invites %}
+              <form id="accept_invite_{{game.id}}"
+                    role="form"
+                    method="post"
+                    action="{% url 'matadorgame.views.accept_game' %}"></form>
+              <input form="accept_invite_{{game.id}}"
+                     type="hidden" name="game_id", value="{{ game.id }}"/>
+              <tr>
+                <td>{{ game.id }}</td>
+                <td>{% opponent game me %}</td>
+                <td>
+                  <input class="form-control" type="text"
+                         name="number" id="id_number" placeholder="0000"
+                         form="accept_invite_{{game.id}}">
+                </td>
+                <td>
+                  <button type="submit" class="btn btn-default"
+                          form="accept_invite_{{game.id}}">Start</button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% block scripts%}
+<script src="{% static "matadorgame/js/magicsuggest-1.3.1-min.js" %}"></script>
 <script src="{% static "matadorgame/js/dashboard.js" %}"></script>
 {% endblock %}
 {% endblock %}
