@@ -6,36 +6,79 @@
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 
-<form role="form"
-      method="post"
-      action="{% url 'django.contrib.auth.views.login' %}">
-  {% csrf_token %}
-  <div class="form-group">
-    <label for="id_username">{{ form.username.label_tag }}</label>
-    <input type="text" class="form-control"
-           name="username" id="id_username" placeholder="Enter username">
+<div class="row">
+  <div class="col-md-3">
+    <h3>Login</h3>
+    <form role="form"
+          method="post"
+          action="{% url 'django.contrib.auth.views.login' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="id_username">{{ form.username.label_tag }}</label>
+        <input type="text" class="form-control"
+               name="username" id="id_username" placeholder="Enter username">
+      </div>
+      <div class="form-group">
+        <label for="id_password">Password</label>
+        <input type="password" name="password"
+               class="form-control" id="id_password" placeholder="Enter password">
+      </div>
+      <button type="submit" value="login" class="btn btn-success">Login</button>
+      <input type="hidden" name="next" value="{{ next }}" />
+    </form>
   </div>
-  <div class="form-group">
-    <label for="id_password">Password</label>
-    <input type="password" name="password"
-           class="form-control" id="id_password" placeholder="Enter password">
+  <div class="col-md-8">
+    <h3>Create new account</h3>
+    <form role="form"
+          method="post"
+          action="{% url 'matadorgame.views.create_account' %}">
+      <div class="form-group">
+        <!-- Username -->
+        <label for="username">Username</label>
+        <div class="controls">
+          <input type="text" id="username" name="username"
+                 placeholder="" class="form-control">
+          <p class="help-block">
+            Username can contain any letters or numbers, without spaces
+          </p>
+        </div>
+      </div>
+      <div class="form-group">
+        <!-- E-mail -->
+        <label for="email">E-mail</label>
+        <div class="controls">
+          <input type="text" id="email" name="email"
+                 placeholder="" class="form-control">
+          <p class="help-block">Please provide your E-mail</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <!-- Password-->
+        <label for="password">Password</label>
+        <div class="controls">
+          <input type="password" id="password"
+                 name="password" placeholder="" class="form-control">
+          <p class="help-block">Password should be at least 4 characters</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <!-- Password -->
+        <label for="password_confirm">
+          Password (Confirm)
+        </label>
+        <div class="controls">
+          <input type="password" id="password_confirm"
+                 name="password_confirm" placeholder="" class="form-control">
+          <p class="help-block">Please confirm password</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <!-- Button -->
+        <div class="controls">
+          <button class="btn btn-success">Register</button>
+        </div>
+      </div>
+    </form>
   </div>
-  <button type="submit" value="login" class="btn btn-default">Submit</button>
-  <input type="hidden" name="next" value="{{ next }}" />
-</form>
-<!-- <form class="navbar-form navbar-left" -->
-<!--       method="post" -->
-<!--       action="{% url 'django.contrib.auth.views.login' %}"> -->
-<!--   {% csrf_token %} -->
-<!-- <div class="form-group"> -->
-<!--   {{ form.username.label_tag }} -->
-<!--   {{ form.username }} -->
-<!--   {{ form.password.label_tag }} -->
-<!--   {{ form.password }} -->
-<!-- </div> -->
-
-<!--   <input type="submit" value="login" /> -->
-<!--   <input type="hidden" name="next" value="{{ next }}" /> -->
-<!-- </form> -->
-
+</div>
 {% endblock %}

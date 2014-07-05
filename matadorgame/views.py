@@ -114,3 +114,8 @@ def player_suggest(request):
     query = request.REQUEST['query']
     json_list = Player.get_suggestions(query, exclude_id=player.id)
     return HttpResponse(json_list, content_type='application/json')
+
+@csrf_exempt
+@require_POST
+def create_account(request):
+    return redirect('matadorgame.views.dashboard_view')
