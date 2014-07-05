@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect
 from matadorgame.models import HumanPlayer, Game, Move, PlayerNumber, Player
 from django.contrib.auth import logout, login, authenticate
+from django.contrib.auth.models import User, Group
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
@@ -118,4 +119,20 @@ def player_suggest(request):
 @csrf_exempt
 @require_POST
 def create_account(request):
+    username         = request.POST['username']
+    email            = request.POST['email']
+    password         = request.POST['password']
+    full_name        = request.POST['full_name']
+    password_confirm = request.POST['password_confirm']
+    if password != password_confirm or\
+       User.objects.filter(username=username).exists():
+        return redirect('django.contrib.auth.views.login')
+    split_name = full_name.split(' ')
+    user = User.objects.create_user(username,
+                                    email,
+                                    password,
+                                    first_name = split_name[0])
+
+    HumanPlayer.objects.create(user=user, name=full_name)
+
     return redirect('matadorgame.views.dashboard_view')
