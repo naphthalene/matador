@@ -131,8 +131,8 @@ class Game(M.Model):
 
         player_moves   = self.moves.filter(player=player)
         opponent_moves = self.moves.filter(player=opponent)
-        player_guessed_right   = player_moves.filter(cows=4).exists()
-        opponent_guessed_right = opponent_moves.filter(cows=4).exists()
+        player_guessed_right   = player_moves.filter(bulls=4).exists()
+        opponent_guessed_right = opponent_moves.filter(bulls=4).exists()
 
         if player_guessed_right and opponent_guessed_right:
             if len(player_moves) <= len(opponent_moves):
