@@ -158,19 +158,19 @@ class Move(M.Model):
         help_text="The guess of opponent's number",
         null=True)
 
-    bulls = M.IntegerField(
+    cows = M.IntegerField(
         validators=[valid_grade],
         help_text="Count of correct numbers in incorrect spots",
         null=True)
 
-    cows = M.IntegerField(
+    bulls = M.IntegerField(
         validators=[valid_grade],
         help_text="Count of correct numbers in correct spots",
         null=True)
 
     def save(self, *args, **kwargs):
         if self.guess:
-            self.bulls, self.cows = self._evaluate(self.guess)
+            self.cows, self.bulls = self._evaluate(self.guess)
         super(Move, self).save(*args, **kwargs)
 
     def _evaluate(self, guess):
@@ -178,17 +178,15 @@ class Move(M.Model):
             number = PlayerNumber.objects.get(
                 player=self.game.get_opponent(self.player),
                 game=self.game).number
-            print "Player %s made guess of %s where real number is %s" \
-                % (self.player.name, guess, number)
             bulls = []
             cows  = []
             for spot in range(4):
                 if guess[spot] == number[spot]:
-                    cows.append(spot)
+                    bulls.append(spot)
 
-            guessed_spots = cows[:]
+            guessed_spots = bulls[:]
             for spot in range(4):
-                if spot in cows:
+                if spot in bulls:
                     # This digit is already a cow, skip
                     continue
                 for subspot in range(4):
@@ -197,11 +195,11 @@ class Move(M.Model):
                     if subspot in guessed_spots:
                         continue
                     if guess[spot] == number[subspot]:
-                        bulls.append(spot)
+                        cows.append(spot)
                         guessed_spots.append(subspot)
                         break
 
-            return (len(bulls), len(cows))
+            return (len(cows), len(bulls))
         except Exception as e:
             print e
             return (None, None)

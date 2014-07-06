@@ -42,16 +42,16 @@
           <thead>
             <tr>
               <th>Guess</th>
-              <th>Bulls</th>
               <th>Cows</th>
+              <th>Bulls</th>
             </tr>
           </thead>
           <tbody>
             {% for move in my_moves %}
             <tr>
               <td>{{ move.guess }}</td>
-              <td>{{ move.bulls }}</td>
               <td>{{ move.cows }}</td>
+              <td>{{ move.bulls }}</td>
             </tr>
             {% endfor %}
         </table>
@@ -63,16 +63,16 @@
           <thead>
             <tr>
               <th>Guess</th>
-              <th>Bulls</th>
               <th>Cows</th>
+              <th>Bulls</th>
             </tr>
           </thead>
           <tbody>
             {% for move in opponent_moves %}
             <tr>
               <td>{{ move.guess }}</td>
-              <td>{{ move.bulls }}</td>
               <td>{{ move.cows }}</td>
+              <td>{{ move.bulls }}</td>
             </tr>
             {% endfor %}
         </table>

@@ -21,7 +21,6 @@ def dashboard_view(request):
     dash_context['invites'] = sorted(player.get_invitations(),
                                      key=lambda g: g.id,
                                      reverse=True)
-    print dash_context['me']
     return render(request, dash_template, dash_context)
 
 @login_required
