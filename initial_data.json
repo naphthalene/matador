@@ -7,11 +7,26 @@
     }
   },
   {
+    "pk": 2,
+    "model": "matadorgame.player",
+    "fields": {
+      "name": "PrimeBot"
+    }
+  },
+  {
     "pk": 1,
     "model": "matadorgame.bot",
     "fields": {
       "description": "Really really stupid",
       "implementation": "matadorgame.bots.dumb.DumbBot"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "matadorgame.bot",
+    "fields": {
+      "description": "Initial attempt",
+      "implementation": "matadorgame.bots.prime.PrimeBot"
     }
   }
 ]
