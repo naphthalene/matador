@@ -87,7 +87,8 @@ class Bot(Player):
         help_text="Full dotted name of Bot subclass")
 
     def get_next_move(self, game):
-        bot_guess = resolve(self.implementation)().guess(self, game)
+        bot_moves = self.moves.filter(game=game)
+        bot_guess = resolve(self.implementation)().guess(self, bot_moves)
         return Move.objects.create(game=game,
                                    player=self,
                                    guess=bot_guess)

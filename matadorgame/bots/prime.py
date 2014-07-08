@@ -1,17 +1,14 @@
-from base import Bot
-
-class PrimeBot(Bot):
-    def guess(self, player, game):
-        my_moves = list(game.moves.filter(player=player))
+class PrimeBot():
+    def guess(self, moves):
         number = ''
         def previous_move():
-            return my_moves[-1]
+            return moves[-1]
 
-        if len(my_moves) == 0:
+        if len(moves) == 0:
             # Initial guess
             number = '1234'
 
-        elif len(my_moves) == 1:
+        elif len(moves) == 1:
             m = previous_move()
             if m.bulls > 0:
                 # We already guessed 1 or more correct digits.
